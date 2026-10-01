@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titulo %}Inscritos{% endblock %}
+{% block conteudo %}
+<section class="cartao" aria-labelledby="titulo-lista">
+  <div class="lista-topo">
+    <h2 id="titulo-lista">Inscritos</h2>
+    <form method="post" action="/admin/logout">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button type="submit" class="botao secundario">Sair ({{ usuario }})</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

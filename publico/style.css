@@ -41,7 +41,7 @@ main { padding-bottom: 48px; }
 /* Formulário */
 .campo { margin: 0 0 16px; padding: 0; border: 0; min-width: 0; }
 label, legend { display: block; margin-bottom: 4px; font-weight: 600; padding: 0; }
-input[type="text"], input[type="email"], select {
+input[type="text"], input[type="email"], input[type="password"], select {
   width: 100%;
   min-height: 44px;
   padding: 8px 12px;
