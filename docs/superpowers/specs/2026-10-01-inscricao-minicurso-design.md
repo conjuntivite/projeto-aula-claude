@@ -50,16 +50,42 @@ Página estática de inscrição para o minicurso, para alunos da universidade. 
 
 ## Visual e layout
 
-- Claro, minimalista, tons quentes: fundo off-white, acento terracota, fonte do sistema. Sem logos ou marcas.
-- CSS com variáveis, grid e media query.
-- Celular: uma coluna, lista em cards.
-- Tela larga: formulário com largura limitada, lista em tabela.
+Referência de design: skill `ui-ux-pro-max` (só guia; o código segue em HTML/CSS/JS puros, sem Tailwind, shadcn nem fontes externas). Estilo: Minimalismo, claro, sem tema escuro. Dials: variância 2, movimento 2, densidade 4.
 
-## Acessibilidade
+**Tokens** (variáveis CSS em `:root`; paleta "warm terracotta" da skill):
 
-- Labels associados a cada campo, `fieldset`/`legend` no grupo de rádio.
-- Erros e sucesso em `aria-live`.
-- Foco visível e contraste adequado.
+| Token | Valor | Uso |
+|---|---|---|
+| `--cor-primaria` | `#9A3412` | botões, links, foco (`--ring`) |
+| `--cor-sobre-primaria` | `#FFFFFF` | texto sobre a primária |
+| `--cor-fundo` | `#FFFBEB` | fundo da página |
+| `--cor-cartao` | `#FFFFFF` | formulário e lista |
+| `--cor-texto` | `#0F172A` | texto principal |
+| `--cor-texto-suave` | `#475569` | ajuda, rótulos secundários |
+| `--cor-suave` | `#F8F2F0` | linhas alternadas, estado vazio |
+| `--cor-borda` | `#F2E6E2` | bordas de cartão e tabela |
+| `--cor-erro` | `#DC2626` | erros (texto e borda) |
+| `--cor-sucesso` | `#047857` | mensagem de sucesso. A paleta sugere `#059669`; usamos um tom mais escuro para manter contraste 4.5:1 em texto |
+
+**Tipografia:** pilha do sistema (`system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`), pois todas as fontes sugeridas pela skill vêm do Google Fonts (dependência externa). Corpo 16px, `line-height` 1.5, títulos com peso 700.
+
+**Layout e componentes:**
+- CSS com variáveis, grid e media query, mobile-first.
+- Celular (a partir de 360px): uma coluna, alvos de toque de no mínimo 44px, lista em cards.
+- Tela larga (breakpoint ~768px): formulário com largura limitada, lista em tabela.
+- Sem emojis como ícones; se houver ícone, SVG inline.
+- Transições de 150-250ms só em `color`, `background` e `border-color`. Respeitar `prefers-reduced-motion`.
+- `cursor: pointer` nos elementos clicáveis; botão desabilitado com aparência distinta.
+- Checagem final de responsividade em 375, 768, 1024 e 1440px.
+
+## Acessibilidade e feedback de formulário
+
+- Labels visíveis e associados a cada campo (nunca placeholder como label); `fieldset`/`legend` no grupo de rádio.
+- Erro inline abaixo de cada campo inválido, ligado ao campo por `aria-describedby`, com `aria-invalid`. Validação no `blur` e, depois do primeiro erro, também no `input`.
+- Resumo de erros no topo do formulário após um envio inválido: `role="alert"`, `tabindex="-1"`, foco movido para ele, cada item com link para o campo. Os erros inline permanecem.
+- Sucesso em região `aria-live="polite"`.
+- Foco visível (anel com `--cor-primaria`), nunca removido.
+- Contraste mínimo 4.5:1 para texto; erro e estado nunca dependem só de cor (texto de erro sempre presente).
 
 ## Estrutura do `app.js`
 
