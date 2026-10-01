@@ -98,3 +98,12 @@ def test_so_a_pasta_publica_e_servida(client, caminho):
 def test_pagina_publica_e_servida(client):
     r = client.get("/")
     assert r.status_code == 200 and "Claude AI" in r.text
+
+
+def test_422_nao_ecoa_chaves_enviadas_pelo_cliente(client):
+    longa = "k" * 500
+    corpo = payload(**{"<script>alert(1)</script>": 1, longa: 2})
+    r = client.post("/api/inscricoes", json=corpo)
+    assert r.status_code == 422
+    assert "<script>" not in r.text and "alert" not in r.text and longa not in r.text
+    assert set(r.json()["erros"]) <= set(MENSAGENS_ERRO) | {"_geral"}

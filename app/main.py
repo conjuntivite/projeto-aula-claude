@@ -40,7 +40,7 @@ async def erro_validacao(_request: Request, exc: RequestValidationError):
     erros: dict[str, str] = {}
     for e in exc.errors():
         loc = e.get("loc", ())
-        campo = loc[1] if len(loc) > 1 and isinstance(loc[1], str) else "_geral"
+        campo = loc[1] if len(loc) > 1 and loc[1] in MENSAGENS_ERRO else "_geral"
         erros[campo] = MENSAGENS_ERRO.get(campo, "Valor inválido.")
     return JSONResponse({"erros": erros}, status_code=422)
 
