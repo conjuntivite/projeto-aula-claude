@@ -106,3 +106,14 @@ def test_csrf_valido():
 def test_csrf_nao_ascii_nao_quebra():
     assert seguranca.csrf_valido("abc", "çãé") is False
     assert seguranca.csrf_valido("çãé", "çãé") is True
+
+
+@pytest.mark.parametrize("senha", ["\ud800", None])
+def test_verificar_com_senha_hostil_devolve_false(senha):
+    assert seguranca.verificar_senha(seguranca.HASH_FALSO, senha) is False
+    assert seguranca.verificar_senha(seguranca.hash_senha(SENHA), senha) is False
+
+
+@pytest.mark.parametrize("hash_", ["\ud800", None])
+def test_verificar_com_hash_hostil_devolve_false(hash_):
+    assert seguranca.verificar_senha(hash_, SENHA) is False

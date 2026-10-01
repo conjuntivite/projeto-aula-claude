@@ -28,7 +28,7 @@ def hash_senha(senha: str) -> str:
 def verificar_senha(hash_: str, senha: str) -> bool:
     try:
         return _ph.verify(hash_, senha)
-    except (VerificationError, InvalidHashError):
+    except (VerificationError, InvalidHashError, UnicodeError, TypeError, AttributeError):
         return False
 
 
