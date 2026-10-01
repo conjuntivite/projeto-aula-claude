@@ -2,6 +2,8 @@ import hashlib
 import hmac
 import secrets
 import sqlite3
+import time
+from collections import defaultdict, deque
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
@@ -89,6 +91,7 @@ def apagar_sessao(con, token: str | None) -> None:
 
 def limpar_expiradas(con) -> None:
     con.execute("DELETE FROM sessoes WHERE expira_em <= ?", (db.agora(),))
+    con.execute("DELETE FROM tentativas_login WHERE criada_em <= ?", (db.agora_mais(-JANELA_LOGIN_S),))
 
 
 # Decisão 6: comparação em tempo constante. Codifica antes porque compare_digest
@@ -97,3 +100,49 @@ def csrf_valido(esperado: str, recebido: str | None) -> bool:
     if not recebido:
         return False
     return hmac.compare_digest(esperado.encode("utf-8", "replace"), recebido.encode("utf-8", "replace"))
+
+
+# Decisão 3: 5 falhas por usuário e IP em 15 minutos bloqueiam temporariamente. A chave
+# é o texto digitado (exista o usuário ou não), então o bloqueio não revela quem existe.
+MAX_FALHAS = 5
+JANELA_LOGIN_S = 15 * 60
+
+
+def normalizar_usuario(usuario: str) -> str:
+    return usuario.strip().lower()[:100]
+
+
+def registrar_falha(con, usuario: str, ip: str) -> None:
+    con.execute("INSERT INTO tentativas_login (usuario, ip, criada_em) VALUES (?, ?, ?)",
+                (normalizar_usuario(usuario), ip, db.agora()))
+
+
+def bloqueado(con, usuario: str, ip: str) -> bool:
+    n = con.execute(
+        "SELECT COUNT(*) FROM tentativas_login WHERE usuario = ? AND ip = ? AND criada_em > ?",
+        (normalizar_usuario(usuario), ip, db.agora_mais(-JANELA_LOGIN_S)),
+    ).fetchone()[0]
+    return n >= MAX_FALHAS
+
+
+def limpar_falhas(con, usuario: str, ip: str) -> None:
+    con.execute("DELETE FROM tentativas_login WHERE usuario = ? AND ip = ?", (normalizar_usuario(usuario), ip))
+
+
+# Decisão 10: limite de envios da inscrição pública, por IP, em memória.
+# ponytail: zera ao reiniciar e não é compartilhado entre processos; em produção, usar um
+# armazenamento compartilhado (Redis ou tabela).
+class LimitadorPorIp:
+    def __init__(self, maximo: int, janela_s: float, relogio=time.monotonic):
+        self._maximo, self._janela, self._relogio = maximo, janela_s, relogio
+        self._eventos: dict[str, deque] = defaultdict(deque)
+
+    def permitir(self, ip: str) -> bool:
+        agora = self._relogio()
+        fila = self._eventos[ip]
+        while fila and agora - fila[0] > self._janela:
+            fila.popleft()
+        if len(fila) >= self._maximo:
+            return False
+        fila.append(agora)
+        return True

@@ -117,3 +117,63 @@ def test_verificar_com_senha_hostil_devolve_false(senha):
 @pytest.mark.parametrize("hash_", ["\ud800", None])
 def test_verificar_com_hash_hostil_devolve_false(hash_):
     assert seguranca.verificar_senha(hash_, SENHA) is False
+
+
+def test_bloqueia_na_quinta_falha_do_mesmo_usuario_e_ip(con):
+    for _ in range(4):
+        seguranca.registrar_falha(con, "admin", "1.1.1.1")
+    assert seguranca.bloqueado(con, "admin", "1.1.1.1") is False
+    seguranca.registrar_falha(con, "admin", "1.1.1.1")
+    assert seguranca.bloqueado(con, "admin", "1.1.1.1") is True
+
+
+def test_outro_ip_ou_outro_usuario_nao_e_bloqueado(con):
+    for _ in range(5):
+        seguranca.registrar_falha(con, "admin", "1.1.1.1")
+    assert seguranca.bloqueado(con, "admin", "2.2.2.2") is False
+    assert seguranca.bloqueado(con, "outro", "1.1.1.1") is False
+
+
+def test_usuario_ignora_maiusculas_e_espacos(con):
+    for _ in range(5):
+        seguranca.registrar_falha(con, " Admin ", "1.1.1.1")
+    assert seguranca.bloqueado(con, "admin", "1.1.1.1") is True
+
+
+def test_falhas_antigas_nao_contam(con):
+    for _ in range(5):
+        con.execute("INSERT INTO tentativas_login (usuario, ip, criada_em) VALUES (?, ?, ?)",
+                    ("admin", "1.1.1.1", db.agora_mais(-(seguranca.JANELA_LOGIN_S + 1))))
+    assert seguranca.bloqueado(con, "admin", "1.1.1.1") is False
+
+
+def test_limpar_falhas_zera_o_contador(con):
+    for _ in range(5):
+        seguranca.registrar_falha(con, "admin", "1.1.1.1")
+    seguranca.limpar_falhas(con, "admin", "1.1.1.1")
+    assert seguranca.bloqueado(con, "admin", "1.1.1.1") is False
+
+
+def test_limpar_expiradas_apaga_tentativas_antigas(con):
+    con.execute("INSERT INTO tentativas_login (usuario, ip, criada_em) VALUES (?, ?, ?)",
+                ("admin", "1.1.1.1", db.agora_mais(-(seguranca.JANELA_LOGIN_S + 1))))
+    seguranca.registrar_falha(con, "admin", "1.1.1.1")
+    seguranca.limpar_expiradas(con)
+    assert con.execute("SELECT COUNT(*) FROM tentativas_login").fetchone()[0] == 1
+
+
+class Relogio:
+    def __init__(self):
+        self.t = 1000.0
+
+    def __call__(self):
+        return self.t
+
+
+def test_limitador_bloqueia_apos_o_maximo_e_libera_depois_da_janela():
+    r = Relogio()
+    lim = seguranca.LimitadorPorIp(maximo=3, janela_s=60, relogio=r)
+    assert [lim.permitir("1.1.1.1") for _ in range(4)] == [True, True, True, False]
+    assert lim.permitir("2.2.2.2") is True
+    r.t += 61
+    assert lim.permitir("1.1.1.1") is True
