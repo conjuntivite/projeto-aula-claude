@@ -13,3 +13,12 @@ def banco(tmp_path, monkeypatch):
 def con(banco):
     with db.transacao() as c:
         yield c
+from fastapi.testclient import TestClient
+
+
+@pytest.fixture
+def client(banco):
+    from app.main import criar_app
+
+    with TestClient(criar_app(), follow_redirects=False) as c:
+        yield c

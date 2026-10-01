@@ -1,7 +1,7 @@
 // Testes das funções puras de app.js. Dados fictícios apenas.
 // Node: `node teste.js`  |  Navegador: abrir teste.html
 const assert = typeof require !== 'undefined' ? require('assert') : { strictEqual: (a, b) => { if (a !== b) throw new Error(`esperado ${JSON.stringify(b)}, veio ${JSON.stringify(a)}`); } };
-const A = typeof module !== 'undefined' ? require('./app.js') : App;
+const A = typeof module !== 'undefined' ? require('../../publico/app.js') : App;
 
 const valido = () => ({ nome: 'Aluno Teste', email: 'teste1@exemplo.com', curso: 'Direito', periodo: '3', experiencia: 'basica', lgpd: true });
 const resultados = [];
