@@ -120,3 +120,8 @@ td::before { content: attr(data-rotulo); flex: 0 0 8.5em; font-weight: 600; colo
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+.botao { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtro-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filtro-linha select { flex: 1 1 12em; }

@@ -1,11 +1,14 @@
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import Path as CaminhoParam
+from fastapi.responses import RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app import config, db, seguranca
+from app.csv_export import gerar_csv
 from app.rotas_publicas import ip_do_cliente
+from app.validacao import CURSOS, EXPERIENCIAS
 
 COOKIE = "sessao"
 # Autoescape do Jinja2 fica ligado para .html: dado do usuário nunca vira HTML.
@@ -75,9 +78,33 @@ def entrar(request: Request, usuario: str = Form(max_length=100), senha: str = F
 
 
 @router.get("")
-def pagina_admin(request: Request, sessao: dict = Depends(exigir_admin)):
-    return TEMPLATES.TemplateResponse(
-        request, "admin.html", {"usuario": sessao["usuario"], "csrf": sessao["csrf_token"]})
+def pagina_admin(request: Request, curso: str = "", sessao: dict = Depends(exigir_admin)):
+    # O filtro só aceita cursos da lista; qualquer outro valor é ignorado.
+    if curso not in CURSOS:
+        curso = ""
+    with db.transacao() as con:
+        total = db.contar(con)
+        inscritos = [dict(r) for r in db.listar_inscricoes(con, curso or None)]
+    return TEMPLATES.TemplateResponse(request, "admin.html", {
+        "usuario": sessao["usuario"], "csrf": sessao["csrf_token"], "inscritos": inscritos,
+        "total": total, "curso": curso, "cursos": CURSOS, "experiencias": EXPERIENCIAS})
+
+
+@router.post("/inscricoes/{inscricao_id}/remover")
+def remover(inscricao_id: int = CaminhoParam(ge=1, le=2**31 - 1), csrf: str = Form(""),
+            sessao: dict = Depends(exigir_admin)):
+    verificar_csrf(sessao, csrf)
+    with db.transacao() as con:
+        db.remover_inscricao(con, inscricao_id)
+    return RedirectResponse("/admin", status_code=303)
+
+
+@router.get("/inscricoes.csv")
+def exportar_csv(_sessao: dict = Depends(exigir_admin)):
+    with db.transacao() as con:
+        inscritos = db.listar_inscricoes(con)
+    return Response(gerar_csv(inscritos), media_type="text/csv",
+                    headers={"Content-Disposition": 'attachment; filename="inscritos-minicurso.csv"'})
 
 
 @router.post("/logout")
