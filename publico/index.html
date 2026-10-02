@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inscrição — Claude AI: o Ecossistema da Anthropic</title>
+  <meta name="description" content="Inscrição para o minicurso Claude AI: o Ecossistema da Anthropic.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>Claude AI: o Ecossistema da Anthropic</h1>
+    <p>Minicurso para alunos da universidade. Preencha o formulário para garantir sua vaga.</p>
+  </header>
+
+  <main>
+    <section class="cartao" aria-labelledby="titulo-form">
+      <h2 id="titulo-form">Inscrição</h2>
+
+      <p id="sucesso" class="sucesso" role="status" aria-live="polite" hidden></p>
+      <p id="aviso" class="erro" role="alert" hidden></p>
+
+      <div id="resumo" class="resumo" role="alert" tabindex="-1" hidden>
+        <h3>Revise os campos abaixo</h3>
+        <ul id="resumo-lista"></ul>
+      </div>
+
+      <form id="form" novalidate>
+        <div class="campo">
+          <label for="nome">Nome completo</label>
+          <input id="nome" name="nome" type="text" autocomplete="name" required maxlength="100" aria-describedby="erro-nome">
+          <p id="erro-nome" class="erro"></p>
+        </div>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="erro-email">
+          <p id="erro-email" class="erro"></p>
+        </div>
+
+        <div class="linha">
+          <div class="campo">
+            <label for="curso">Curso</label>
+            <select id="curso" name="curso" required aria-describedby="erro-curso">
+              <option value="">Selecione…</option>
+            </select>
+            <p id="erro-curso" class="erro"></p>
+          </div>
+
+          <div class="campo">
+            <label for="periodo">Período</label>
+            <select id="periodo" name="periodo" required aria-describedby="erro-periodo">
+              <option value="">Selecione…</option>
+            </select>
+            <p id="erro-periodo" class="erro"></p>
+          </div>
+        </div>
+
+        <fieldset class="campo" id="grupo-experiencia" aria-describedby="erro-experiencia">
+          <legend>Experiência com IA</legend>
+          <div class="opcoes">
+            <label class="opcao"><input type="radio" id="exp-nenhuma" name="experiencia" value="nenhuma"> Nenhuma</label>
+            <label class="opcao"><input type="radio" id="exp-basica" name="experiencia" value="basica"> Básica</label>
+            <label class="opcao"><input type="radio" id="exp-avancada" name="experiencia" value="avancada"> Avançada</label>
+          </div>
+          <p id="erro-experiencia" class="erro"></p>
+        </fieldset>
+
+        <div class="campo">
+          <label class="opcao consentimento">
+            <input type="checkbox" id="lgpd" name="lgpd" required aria-describedby="erro-lgpd">
+            <span>Autorizo o uso do meu nome, e-mail, curso, período e experiência apenas para a organização do minicurso (LGPD). Os dados ficam guardados no servidor do evento e só a organização tem acesso.</span>
+          </label>
+          <p id="erro-lgpd" class="erro"></p>
+        </div>
+
+        <button type="submit" class="botao">Inscrever-se</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

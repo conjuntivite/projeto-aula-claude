@@ -28,9 +28,11 @@ Página estática de inscrição para o minicurso, para alunos da universidade. 
 
 ## Lista de inscritos
 
-- Abaixo do formulário, com contador.
+- Abaixo do formulário, com o total ("Total: N inscritos").
+- Filtro por curso: com um curso escolhido, mostra "Mostrando X de N inscritos (Curso)". O CSV exporta sempre todos os inscritos.
 - Mostra todos os campos (nome, e-mail, curso, período, experiência).
-- Sem edição e sem remoção.
+- Botão "Remover" por inscrito, com `confirm()` nativo antes. Depois de remover, o foco vai para o total. O e-mail removido pode ser inscrito de novo.
+- Sem edição.
 - Estado vazio: texto "Nenhuma inscrição ainda".
 - Renderização com `textContent`, nunca `innerHTML` (evita XSS).
 
@@ -102,4 +104,4 @@ Funções simples, sem classes:
 
 ## Fora de escopo (YAGNI)
 
-Login, backend, edição ou remoção de inscritos, paginação, busca, política de privacidade formal, tema escuro, bibliotecas externas.
+Login, backend, edição de inscritos, paginação, busca, política de privacidade formal, tema escuro, bibliotecas externas.
