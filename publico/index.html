@@ -18,6 +18,7 @@
       <h2 id="titulo-form">Inscrição</h2>
 
       <p id="sucesso" class="sucesso" role="status" aria-live="polite" hidden></p>
+      <p id="aviso" class="erro" role="alert" hidden></p>
 
       <div id="resumo" class="resumo" role="alert" tabindex="-1" hidden>
         <h3>Revise os campos abaixo</h3>
@@ -27,13 +28,13 @@
       <form id="form" novalidate>
         <div class="campo">
           <label for="nome">Nome completo</label>
-          <input id="nome" name="nome" type="text" autocomplete="name" required aria-describedby="erro-nome">
+          <input id="nome" name="nome" type="text" autocomplete="name" required maxlength="100" aria-describedby="erro-nome">
           <p id="erro-nome" class="erro"></p>
         </div>
 
         <div class="campo">
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="erro-email">
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="erro-email">
           <p id="erro-email" class="erro"></p>
         </div>
 
@@ -68,38 +69,13 @@
         <div class="campo">
           <label class="opcao consentimento">
             <input type="checkbox" id="lgpd" name="lgpd" required aria-describedby="erro-lgpd">
-            <span>Autorizo o uso do meu nome, e-mail, curso, período e experiência apenas para a organização do minicurso (LGPD). Esta é uma demonstração: os dados ficam somente neste navegador.</span>
+            <span>Autorizo o uso do meu nome, e-mail, curso, período e experiência apenas para a organização do minicurso (LGPD). Os dados ficam guardados no servidor do evento e só a organização tem acesso.</span>
           </label>
           <p id="erro-lgpd" class="erro"></p>
         </div>
 
         <button type="submit" class="botao">Inscrever-se</button>
       </form>
-    </section>
-
-    <section class="cartao" aria-labelledby="titulo-lista">
-      <div class="lista-topo">
-        <h2 id="titulo-lista">Inscritos</h2>
-        <button type="button" id="exportar" class="botao secundario" disabled>Exportar CSV</button>
-      </div>
-
-      <p id="total" class="total" role="status" aria-live="polite" tabindex="-1">Total: 0 inscritos</p>
-      <div class="filtro">
-        <label for="filtro-curso">Filtrar por curso</label>
-        <select id="filtro-curso" disabled>
-          <option value="">Todos os cursos</option>
-        </select>
-      </div>
-
-      <p id="aviso" class="erro" role="status" hidden></p>
-      <p id="vazio" class="vazio">Nenhuma inscrição ainda.</p>
-
-      <table id="tabela" hidden>
-        <thead>
-          <tr><th scope="col">Nome</th><th scope="col">E-mail</th><th scope="col">Curso</th><th scope="col">Período</th><th scope="col">Experiência com IA</th><th scope="col"><span class="so-leitor">Ações</span></th></tr>
-        </thead>
-        <tbody id="corpo"></tbody>
-      </table>
     </section>
   </main>
 
